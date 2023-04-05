@@ -1,0 +1,228 @@
+
+
+--House Sales in Melbourne Data Exploration
+
+--Select Database that we are going to be using
+
+use AustralianHouseSales
+
+--Select Data that we are going to be using
+
+select *
+from dbo.SalesData
+where YearBuilt is not null
+and BuildingArea is not null
+order by House_Id
+
+
+--replace the alphabet with the right data
+--i am not doing it since i want to use join
+
+select House_Id, typeId,
+case
+	when typeId = 'h' then 'House'
+	when typeId = 't' then 'Townhouse'
+	else 'Apartment'
+end as TypeFixed
+from dbo.SalesData
+order by House_Id
+
+
+--updating the alphabet with the right data
+--i am not doing it since i want to use join
+
+update dbo.SalesData
+set type = case type
+	when 'h' then 'House'
+	when 't' then 'Townhouse'
+	else 'Apartment'
+end
+from dbo.SalesData
+
+
+--Joining all table into one table and choose the columns that we want to select
+
+select sal.House_Id, 
+		Suburb, 
+		ty.Type,
+		Rooms, 
+		Price, 
+		Distance, 
+		date, 
+		Landsize, 
+		BuildingArea,
+		RegionName
+from dbo.SalesData sal
+join dbo.Seller sel
+	on	sal.House_Id = sel.House_id
+join dbo.type ty
+	on ty.typeId = sal.TypeId
+where YearBuilt is not null
+and BuildingArea is not null
+and LandSize is not null
+order by House_Id
+
+
+---count how many houses are in melbourne
+
+select ty.type,
+		COUNT(type) as TotalHousesInMelbourne
+from dbo.SalesData sal
+join dbo.type ty
+	on ty.typeId = sal.TypeId
+where YearBuilt is not null
+and BuildingArea is not null
+and LandSize is not null
+group by type
+order by TotalHousesInMelbourne desc
+
+
+--Total of houses according to the region name (Southern Metropolitan is leading with the
+--most house sold)
+
+select Regionname,
+		COUNT(RegionName) as TotalHouseSoldPerRegion
+from dbo.SalesData sal
+where YearBuilt is not null
+and BuildingArea is not null
+and LandSize is not null
+group by regionname
+order by TotalHouseSoldPerRegion desc
+
+--the spreading of the type of houses in Melbourne per Region Name
+
+select Regionname,
+		type,
+		COUNT(type) as TotalHouseByType
+from dbo.SalesData sal
+join dbo.type ty
+	on ty.typeId = sal.TypeId
+where YearBuilt is not null
+and BuildingArea is not null
+and LandSize is not null
+group by regionname, type
+order by TotalHouseByType desc
+
+
+--average price of total house sold in sothern metropolitan
+
+select RegionName,
+		AVG(price) as AverageHousePricePerRegionName
+from dbo.SalesData
+where YearBuilt is not null
+and BuildingArea is not null
+and LandSize is not null
+group by regionname
+order by AverageHousePricePerRegionName desc
+
+
+----Southern Metropolitan has the most bought houses, which suburbs has the most houses sold
+
+select Suburb, 
+	COUNT(type) as MostHousesSoldInSouthernMetropolitan
+from dbo.SalesData sal
+join dbo.Seller sel
+	on	sal.House_Id = sel.House_id
+join dbo.type ty
+	on ty.typeId = sal.TypeId
+where regionname like '%southern%'
+and YearBuilt is not null
+and BuildingArea is not null
+and LandSize is not null
+group by Suburb
+order by MostHousesSoldInSouthernMetropolitan desc
+
+
+--- whose seller sold the most houses
+
+select Seller,
+		COUNT(type) as TotalHouseSoldBySeller
+from dbo.SalesData sal
+join dbo.Seller sel
+	on	sal.House_Id = sel.House_id
+join dbo.type ty
+	on ty.typeId = sal.TypeId
+where YearBuilt is not null
+and BuildingArea is not null
+and LandSize is not null
+group by seller
+order by TotalHouseSoldBySeller desc
+
+
+--spreading of houses type sales based on the top 10 seller
+--nelson sold the most houses 
+
+select top 10 Seller,
+		COUNT(type) as TotalHouseSoldBySeller
+from dbo.SalesData sal
+join dbo.Seller sel
+	on	sal.House_Id = sel.House_id
+join dbo.type ty
+	on ty.typeId = sal.TypeId
+where YearBuilt is not null
+and BuildingArea is not null
+and LandSize is not null
+group by seller
+order by TotalHouseSoldBySeller desc
+
+
+--most of the houses type sold is house compared to townhouse and apartment
+--nelson still the top 1 of top 10 seller, he sold 577 houses and the type is house  
+
+select top 10 Seller,
+		type,
+		COUNT(type) as TotalHouseSoldBySeller
+from dbo.SalesData sal
+join dbo.Seller sel
+	on	sal.House_Id = sel.House_id
+join dbo.type ty
+	on ty.typeId = sal.TypeId
+where YearBuilt is not null
+and BuildingArea is not null
+and LandSize is not null
+group by seller, type
+order by TotalHouseSoldBySeller desc
+
+
+---if you want to know the amount of sales top 10 seller brought
+--even though Nelson Sold the most houses, Jellis is leading in revenue
+
+select top 10 Seller,
+		sum(price) as TotalPricePerSeller
+from dbo.SalesData sal
+join dbo.Seller sel
+	on	sal.House_Id = sel.House_id
+join dbo.type ty
+	on ty.typeId = sal.TypeId
+where YearBuilt is not null
+and BuildingArea is not null
+and LandSize is not null
+group by seller
+order by TotalPricePerSeller desc
+
+
+--percentage of revenue per seller compared to the total revenue per top 10 seller
+---as seen in percent
+
+with CTE_RevenuePerSales
+as 
+(
+select top 10 Seller,
+		sum(price) as TotalPricePerSeller
+from dbo.SalesData sal
+join dbo.Seller sel
+	on	sal.House_Id = sel.House_id
+join dbo.type ty
+	on ty.typeId = sal.TypeId
+where YearBuilt is not null
+and BuildingArea is not null
+and LandSize is not null
+group by seller
+order by TotalPricePerSeller desc
+)
+select seller, 
+		TotalPricePerSeller,
+		TotalPricePerSeller * 100.0/(select SUM(TotalPricePerSeller) 
+			from CTE_RevenuePerSales) as PercentageOfSales
+from CTE_RevenuePerSales
+group by seller, TotalPricePerSeller
