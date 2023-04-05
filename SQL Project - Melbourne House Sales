@@ -51,7 +51,8 @@ select sal.House_Id,
 		date, 
 		Landsize, 
 		BuildingArea,
-		RegionName
+		RegionName,
+		Seller
 from dbo.SalesData sal
 join dbo.Seller sel
 	on	sal.House_Id = sel.House_id
@@ -226,3 +227,40 @@ select seller,
 			from CTE_RevenuePerSales) as PercentageOfSales
 from CTE_RevenuePerSales
 group by seller, TotalPricePerSeller
+
+
+
+--Average distance from the downtown per Region
+
+select RegionName, 
+		AVG(distance) as AverageDistance
+from dbo.SalesData sal
+where YearBuilt is not null
+and BuildingArea is not null
+and LandSize is not null
+group by regionname
+order by AverageDistance desc
+
+
+--Average Landsize per region
+
+select RegionName, 
+		AVG(Landsize) as AverageLandsize
+from dbo.SalesData sal
+where YearBuilt is not null
+and BuildingArea is not null
+and LandSize is not null
+group by regionname
+order by AverageLandsize desc
+
+
+--Average BuildingArea per region
+
+select RegionName, 
+		AVG(BuildingArea) as AverageBuildingArea
+from dbo.SalesData sal
+where YearBuilt is not null
+and BuildingArea is not null
+and LandSize is not null
+group by regionname
+order by AverageBuildingArea desc
