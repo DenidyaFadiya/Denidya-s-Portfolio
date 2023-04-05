@@ -43,19 +43,19 @@ from dbo.SalesData
 --Joining all table into one table and choose the columns that we want to select
 
 select sal.House_Id, 
-		Suburb, 
-		ty.Type,
-		Rooms, 
-		Price, 
-		Distance, 
-		date, 
-		Landsize, 
-		BuildingArea,
-		RegionName,
-		Seller
+	Suburb, 
+	ty.Type,
+	Rooms, 
+	Price, 
+	Distance, 
+	date, 
+	Landsize, 
+	BuildingArea,
+	RegionName,
+	Seller
 from dbo.SalesData sal
 join dbo.Seller sel
-	on	sal.House_Id = sel.House_id
+	on sal.House_Id = sel.House_id
 join dbo.type ty
 	on ty.typeId = sal.TypeId
 where YearBuilt is not null
@@ -67,7 +67,7 @@ order by House_Id
 ---count how many houses are in melbourne
 
 select ty.type,
-		COUNT(type) as TotalHousesInMelbourne
+	COUNT(type) as TotalHousesInMelbourne
 from dbo.SalesData sal
 join dbo.type ty
 	on ty.typeId = sal.TypeId
@@ -82,7 +82,7 @@ order by TotalHousesInMelbourne desc
 --most house sold)
 
 select Regionname,
-		COUNT(RegionName) as TotalHouseSoldPerRegion
+	COUNT(RegionName) as TotalHouseSoldPerRegion
 from dbo.SalesData sal
 where YearBuilt is not null
 and BuildingArea is not null
@@ -93,8 +93,8 @@ order by TotalHouseSoldPerRegion desc
 --the spreading of the type of houses in Melbourne per Region Name
 
 select Regionname,
-		type,
-		COUNT(type) as TotalHouseByType
+	type,
+	COUNT(type) as TotalHouseByType
 from dbo.SalesData sal
 join dbo.type ty
 	on ty.typeId = sal.TypeId
@@ -108,7 +108,7 @@ order by TotalHouseByType desc
 --average price of total house sold in sothern metropolitan
 
 select RegionName,
-		AVG(price) as AverageHousePricePerRegionName
+	AVG(price) as AverageHousePricePerRegionName
 from dbo.SalesData
 where YearBuilt is not null
 and BuildingArea is not null
@@ -123,7 +123,7 @@ select Suburb,
 	COUNT(type) as MostHousesSoldInSouthernMetropolitan
 from dbo.SalesData sal
 join dbo.Seller sel
-	on	sal.House_Id = sel.House_id
+	on sal.House_Id = sel.House_id
 join dbo.type ty
 	on ty.typeId = sal.TypeId
 where regionname like '%southern%'
@@ -137,10 +137,10 @@ order by MostHousesSoldInSouthernMetropolitan desc
 --- whose seller sold the most houses
 
 select Seller,
-		COUNT(type) as TotalHouseSoldBySeller
+	COUNT(type) as TotalHouseSoldBySeller
 from dbo.SalesData sal
 join dbo.Seller sel
-	on	sal.House_Id = sel.House_id
+	on sal.House_Id = sel.House_id
 join dbo.type ty
 	on ty.typeId = sal.TypeId
 where YearBuilt is not null
@@ -154,10 +154,10 @@ order by TotalHouseSoldBySeller desc
 --nelson sold the most houses 
 
 select top 10 Seller,
-		COUNT(type) as TotalHouseSoldBySeller
+	COUNT(type) as TotalHouseSoldBySeller
 from dbo.SalesData sal
 join dbo.Seller sel
-	on	sal.House_Id = sel.House_id
+	on sal.House_Id = sel.House_id
 join dbo.type ty
 	on ty.typeId = sal.TypeId
 where YearBuilt is not null
@@ -171,11 +171,11 @@ order by TotalHouseSoldBySeller desc
 --nelson still the top 1 of top 10 seller, he sold 577 houses and the type is house  
 
 select top 10 Seller,
-		type,
-		COUNT(type) as TotalHouseSoldBySeller
+	type,
+	COUNT(type) as TotalHouseSoldBySeller
 from dbo.SalesData sal
 join dbo.Seller sel
-	on	sal.House_Id = sel.House_id
+	on sal.House_Id = sel.House_id
 join dbo.type ty
 	on ty.typeId = sal.TypeId
 where YearBuilt is not null
@@ -189,10 +189,10 @@ order by TotalHouseSoldBySeller desc
 --even though Nelson Sold the most houses, Jellis is leading in revenue
 
 select top 10 Seller,
-		sum(price) as TotalPricePerSeller
+	sum(price) as TotalPricePerSeller
 from dbo.SalesData sal
 join dbo.Seller sel
-	on	sal.House_Id = sel.House_id
+	on sal.House_Id = sel.House_id
 join dbo.type ty
 	on ty.typeId = sal.TypeId
 where YearBuilt is not null
@@ -209,10 +209,10 @@ with CTE_RevenuePerSales
 as 
 (
 select top 10 Seller,
-		sum(price) as TotalPricePerSeller
+	sum(price) as TotalPricePerSeller
 from dbo.SalesData sal
 join dbo.Seller sel
-	on	sal.House_Id = sel.House_id
+	on sal.House_Id = sel.House_id
 join dbo.type ty
 	on ty.typeId = sal.TypeId
 where YearBuilt is not null
@@ -222,9 +222,9 @@ group by seller
 order by TotalPricePerSeller desc
 )
 select seller, 
-		TotalPricePerSeller,
-		TotalPricePerSeller * 100.0/(select SUM(TotalPricePerSeller) 
-			from CTE_RevenuePerSales) as PercentageOfSales
+	TotalPricePerSeller,
+	TotalPricePerSeller * 100.0/(select SUM(TotalPricePerSeller) 
+		from CTE_RevenuePerSales) as PercentageOfSales
 from CTE_RevenuePerSales
 group by seller, TotalPricePerSeller
 
@@ -233,7 +233,7 @@ group by seller, TotalPricePerSeller
 --Average distance from the downtown per Region
 
 select RegionName, 
-		AVG(distance) as AverageDistance
+	AVG(distance) as AverageDistance
 from dbo.SalesData sal
 where YearBuilt is not null
 and BuildingArea is not null
@@ -245,7 +245,7 @@ order by AverageDistance desc
 --Average Landsize per region
 
 select RegionName, 
-		AVG(Landsize) as AverageLandsize
+	AVG(Landsize) as AverageLandsize
 from dbo.SalesData sal
 where YearBuilt is not null
 and BuildingArea is not null
@@ -257,7 +257,7 @@ order by AverageLandsize desc
 --Average BuildingArea per region
 
 select RegionName, 
-		AVG(BuildingArea) as AverageBuildingArea
+	AVG(BuildingArea) as AverageBuildingArea
 from dbo.SalesData sal
 where YearBuilt is not null
 and BuildingArea is not null
