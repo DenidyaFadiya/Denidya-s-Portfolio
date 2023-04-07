@@ -19,4 +19,4 @@ Filtered by date
 This Visualization shows the covid situation and the spreadness of the pandemic throughout the country
 
 
-You can Check my Portfolio here : https://public.tableau.com/app/profile/denidya.fadiya
+You can Check my Tableau Interactive Dashboard Portfolio here : https://public.tableau.com/app/profile/denidya.fadiya
