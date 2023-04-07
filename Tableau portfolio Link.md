@@ -14,6 +14,7 @@ quantity bought per each category, and which mall did the sales happened.
 
 
 Covid In Indonesia 2020 
+
 Filtered by date
 This Visualization shows the covid situation and the spreadness of the pandemic throughout the country
 
