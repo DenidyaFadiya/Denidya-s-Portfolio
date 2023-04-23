@@ -9,6 +9,7 @@ where BuildingArea is not null
 order by House_Id
 
 
+
 --replace the alphabet with the right data
 --i am not doing it since i want to use join
 
@@ -42,7 +43,7 @@ select sal.House_Id,
 	Rooms, 
 	Price, 
 	Distance, 
-	date, 
+	year, 
 	Landsize, 
 	BuildingArea,
 	RegionName,
@@ -53,19 +54,22 @@ join dbo.Seller sel
 join dbo.type ty
 	on ty.typeId = sal.TypeId
 where BuildingArea is not null
+and not Landsize = '0'
 order by House_Id
 
 
 ---count how many houses are in melbourne
 
-select ty.type,
+select ty.type
 	count(type) as TotalHousesInMelbourne
 from dbo.SalesData sal
 join dbo.type ty
 	on ty.typeId = sal.TypeId
 where BuildingArea is not null
+and not Landsize = '0'
 group by type
 order by TotalHousesInMelbourne desc
+
 
 
 --Total of houses according to the region name (Southern Metropolitan is leading with the
@@ -75,8 +79,10 @@ select Regionname,
 	count(RegionName) as TotalHouseSoldPerRegion
 from dbo.SalesData sal
 where BuildingArea is not null
+and not Landsize = '0'
 group by regionname
 order by TotalHouseSoldPerRegion desc
+
 
 
 --the spreading of the type of houses in Melbourne per Region Name
@@ -88,8 +94,10 @@ from dbo.SalesData sal
 join dbo.type ty
 	on ty.typeId = sal.TypeId
 where BuildingArea is not null
+and not Landsize = '0'
 group by type, regionname
 order by type, TotalHouseByType desc
+
 
 
 --average price of total house sold in Melbourne
@@ -98,6 +106,7 @@ select RegionName,
 	avg(price) as AverageHousePricePerRegionName
 from dbo.SalesData
 where BuildingArea is not null
+and not Landsize = '0'
 group by regionname
 order by AverageHousePricePerRegionName desc
 
@@ -113,6 +122,7 @@ join dbo.type ty
 	on ty.typeId = sal.TypeId
 where regionname like '%southern%'
 and BuildingArea is not null
+and not Landsize = '0'
 group by Suburb
 order by SoldPerSuburb desc
 
@@ -127,8 +137,10 @@ join dbo.Seller sel
 join dbo.type ty
 	on ty.typeId = sal.TypeId
 where BuildingArea is not null
+and not Landsize = '0'
 group by seller
 order by TotalHouseSoldBySeller desc
+
 
 
 --spreading of houses type sales based on the top 10 seller
@@ -143,8 +155,10 @@ join dbo.Seller sel
 join dbo.type ty
 	on ty.typeId = sal.TypeId
 where BuildingArea is not null
+and not Landsize = '0'
 group by seller
 order by SellerHouseSold desc
+
 
 
 --most of the houses type sold is house compared to townhouse and apartment
@@ -159,8 +173,10 @@ join dbo.Seller sel
 join dbo.type ty
 	on ty.typeId = sal.TypeId
 where BuildingArea is not null
+and not Landsize = '0'
 group by seller, type
 order by SellerHouseSold desc
+
 
 
 ---if you want to know the amount of sales top 10 seller brought
@@ -177,6 +193,7 @@ join dbo.Seller sel
 join dbo.type ty
 	on ty.typeId = sal.TypeId
 where BuildingArea is not null
+and not Landsize = '0'
 group by seller
 order by TotalPricePerSeller desc
 
@@ -189,8 +206,10 @@ select RegionName,
 	avg(distance) as AverageDistance
 from dbo.SalesData sal
 where BuildingArea is not null
+and not Landsize = '0'
 group by regionname
 order by AverageDistance desc
+
 
 
 --Average Landsize per region
@@ -199,8 +218,10 @@ select RegionName,
 	avg(Landsize) as AverageLandsize
 from dbo.SalesData sal
 where BuildingArea is not null
+and not Landsize = '0'
 group by regionname
 order by AverageLandsize desc
+
 
 
 --Average BuildingArea per region
@@ -209,6 +230,7 @@ select RegionName,
 	avg(BuildingArea) as AverageBuildingArea
 from dbo.SalesData sal
 where BuildingArea is not null
+and not Landsize = '0'
 group by regionname
 order by AverageBuildingArea desc
 
@@ -222,6 +244,7 @@ select date,
 from dbo.SalesData
 
 
+
 --updating the year table
 
 alter table dbo.SalesData
@@ -230,12 +253,17 @@ add Year nvarchar(255)
 update dbo.SalesData
 set Year = year(date)
 
+
+
 --count of property by year
 
 select year,
 	count(year) as CountOfProperty
 from dbo.SalesData
+where BuildingArea is not null
+and not Landsize = '0'
 group by year
+
 
 
 --count of type houses by year
@@ -246,5 +274,8 @@ select year,
 from dbo.SalesData Sal
 join dbo.Type Ty
 	on Sal.TypeId = Ty.TypeId
+where BuildingArea is not null
+and not Landsize = '0'
 group by year, type
 order by year, type, CountOfHouses desc
+
